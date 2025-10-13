@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::get('/heloocoder', function () {
     return view('welcome');
 });
+
+
