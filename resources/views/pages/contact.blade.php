@@ -61,7 +61,7 @@
 		<!-- Newsletter Section -->
 		<section class="newsletter-section" style="padding: 40px 0 90px 0;">
 			<div class="container">
-				<div class="newsletter-card" style="background: linear-gradient(135deg, #e4f6ff 0%, #eefaff 100%); border-radius: 28px; padding: 55px 40px; position: relative; overflow: hidden;">
+				<div class="newsletter-card" style="background: linear-gradient(135deg, #e4f6ff 0%, #eefaff 100%); border-radius: 28px; position: relative;">
 					<div class="row align-items-center">
 						<div class="col-lg-6">
 							<h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Deliciousness to your inbox</h2>
@@ -76,8 +76,8 @@
 							</form>
 						</div>
 					</div>
-					<img src="assets/images/about.jpg" alt="Fresh vegetables" style="position: absolute; left: -40px; bottom: -20px; width: 200px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);">
-					<img src="assets/images/about-1.jpg" alt="Healthy dish" style="position: absolute; right: -40px; top: -20px; width: 210px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);">
+					<img src="assets/images/about.jpg" alt="Fresh vegetables" class="newsletter-art newsletter-art-left">
+					<img src="assets/images/about-1.jpg" alt="Healthy dish" class="newsletter-art newsletter-art-right">
 				</div>
 			</div>
 		</section>
@@ -149,6 +149,43 @@
 					transition: transform 0.2s ease;
 				}
 
+				.newsletter-card {
+					padding: clamp(36px, 5vw, 64px) clamp(32px, 6vw, 96px);
+					overflow: hidden;
+				}
+
+				.newsletter-card .row {
+					row-gap: 28px;
+					position: relative;
+					z-index: 2;
+				}
+
+				.newsletter-form {
+					gap: 16px;
+					justify-content: flex-end;
+				}
+
+				.newsletter-art {
+					position: absolute;
+					border-radius: 24px;
+					box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+					pointer-events: none;
+					opacity: 0.9;
+					z-index: 1;
+				}
+
+				.newsletter-art-left {
+					width: clamp(160px, 20vw, 240px);
+					left: -110px;
+					bottom: -70px;
+				}
+
+				.newsletter-art-right {
+					width: clamp(170px, 21vw, 250px);
+					right: -120px;
+					top: -60px;
+				}
+
 						@media (max-width: 991.98px) {
 					.contact-page .contact-hero {
 						margin-top: 90px;
@@ -166,7 +203,7 @@
 						padding: 40px 24px;
 					}
 
-					.newsletter-card img {
+					.newsletter-art {
 						display: none;
 					}
 
