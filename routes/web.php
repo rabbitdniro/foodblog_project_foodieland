@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 Route::get('/', function () {
     return view('pages.home');
@@ -72,14 +71,12 @@ Route::post('/password/forgot', function (Request $request) {
         'identifier' => ['required','string'] // email or mobile
     ]);
     // In a real app: generate token and send link/OTP
-    // For demo, redirect to reset with a fake token
-    $token = Str::random(32);
-    return redirect()->route('password.reset.show', ['token' => $token]);
+    return redirect()->route('password.forgot.show')->with('status', 'If that account exists, we just sent reset instructions.');
 })->name('password.forgot.submit');
 
 // Password reset - set new password
 Route::get('/password/reset/{token}', function ($token) {
-    return view('pages.password.reset', compact('token'));
+    return redirect()->route('password.forgot.show');
 })->name('password.reset.show');
 
 Route::post('/password/reset/{token}', function (Request $request, $token) {
@@ -87,6 +84,6 @@ Route::post('/password/reset/{token}', function (Request $request, $token) {
         'password' => ['required','string','min:6','confirmed']
     ]);
     // In a real app: validate token and update password
-    return redirect()->route('login.show');
+    return redirect()->route('password.forgot.show');
 })->name('password.reset.submit');
 
