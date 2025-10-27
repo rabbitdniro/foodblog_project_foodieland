@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\User;
+use App\Mail\OTPMail;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\AuthResource;
-use Illuminate\Container\Attributes\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\RegisterRequest;
 
 class UserController extends Controller
 {
@@ -17,13 +19,14 @@ class UserController extends Controller
     {
         try {
             // Validate input
-            $request->validated($request->only(['name', 'email', 'password']));
+            $request->validated($request->only(['name', 'email', 'mobile', 'password',]));
 
             // Create the user (hashing the password is important!)
             $user = User::create([
                 'name'     => $request->name,
-                'email'    => $request->email,
-                'password' => $request->password
+                'email'    => $request->email,               
+                'mobile'     => $request->mobile,
+                'password'   => Hash::make($request->password),
             ]);
 
             // Generate API token
@@ -102,4 +105,43 @@ class UserController extends Controller
         }
 
     }
+
+    //send otp function
+    public function sendOTP(Request $request){
+        try{
+            $email = $request->email;
+            $otp = rand(10000, 99999);
+            $count = User::where('email', $email)->count();
+
+            if($count === 1){
+                //send otp to user email
+                mail::to($email)->send(new OTPMail($otp));
+
+                //save otp to database
+                User::where('email', $email)->update(['otp' => $otp]); 
+
+                return response()->json([
+                    'message' => "OTP sent successfully",
+                    'status' => 200
+                ], 200);            
+            }
+
+            return response()->json([
+                'message' => "User not found",
+                'status' => 404
+            ], 404);
+
+        }catch(Exception $e){
+            return response()->json([
+                'message' =>  $e->getMessage(),
+                'status'  => 500,
+            ], 500);
+        }
+        
+    }
+
+    //verify otp
+
+    //reset password
+ 
 }

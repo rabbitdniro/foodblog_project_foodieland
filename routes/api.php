@@ -5,14 +5,12 @@ use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
 
 
-//login route for user
-Route::post('/login', [UserController::class, 'userLogin']);
-Route::post('/register', [UserController::class, 'userRegister']);
+//login, register, sendOTP, route for user
+Route::post('/login', [UserController::class, 'userLogin'])->name('login.show');
+Route::post('/register', [UserController::class, 'userRegister'])->name('register.show');
+Route::post('/send-otp', [UserController::class, 'sendOTP'])->name('send.otp');
 
 //Category routes listing
 Route::get('/category', [CategoryController::class, 'categoryList'])->name('category.List');
