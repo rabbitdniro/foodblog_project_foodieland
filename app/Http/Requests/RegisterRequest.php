@@ -21,11 +21,29 @@ class RegisterRequest extends FormRequest
      */
     public function rules(): array
     {
+        // return [
+        //     'name' => 'required|string|max:255',
+        //     'email' => 'required|email|unique:users,email',
+        //     'mobile' => 'required|regex:/^\+?[0-9]{8,15}$/|unique:users,mobile',
+        //     'password' => 'required|string|min:6|confirmed',
+        // ];
+        
+        // stronger Register password validation rules
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'mobile' => 'required|regex:/^\+?[0-9]{8,15}$/|unique:users,mobile',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8', // minimum 8 characters
+                'confirmed', // must match password_confirmation
+                'regex:/[a-z]/',      // at least one lowercase letter
+                'regex:/[A-Z]/',      // at least one uppercase letter
+                'regex:/[0-9]/',      // at least one digit
+                'regex:/[@$!%*?&]/',  // at least one special character
+            ],
         ];
+
     }
 }

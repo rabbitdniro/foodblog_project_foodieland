@@ -14,7 +14,24 @@ use App\Http\Requests\RegisterRequest;
 
 class UserController extends Controller
 {
-    
+    public function registerPage(){
+        return view('pages.register');
+    }
+
+    public function loginPage(){
+        return view('pages.login');
+    }
+
+    public function sandOTPPage(){
+        return view('pages.login');
+    }
+
+    public function resetPasswordPage(){
+        return view('pages.password.forgot');
+    }
+ //..............................................................................
+
+    //User register Api Sanctum implementation
     public function userRegister(RegisterRequest $request)
     {
         try {
@@ -106,8 +123,9 @@ class UserController extends Controller
 
     }
 
-    //send otp function
-    public function sendOTP(Request $request){
+    //User send otp Api Sanctum implementation
+    public function sendOTP(Request $request)
+    {
         //validate request
         $email = $request->validate([
             'email' => 'required|email|exists:users,email'
@@ -145,33 +163,79 @@ class UserController extends Controller
         
     }
 
-    //verify otp
-    public function verifyOTP(Request $request){
-        //validate request
-        $request->validate([
-            'email' => 'required|email',
-            'otp' => 'required|digits:5',
-        ]);
+    //User verify otp Api Sanctum implementation
+    public function verifyOTP(Request $request)
+    {
+        try{
+            $email = $request->email;
+            $otp = $request->otp;
+            
+            $user = User::where('email', $email)->where('otp', $otp)->first();
 
-        //Find user by email
-        $user = User::where('email', $request->email)->first();
+            if($user !== null){
+                $user::where('email', $email)->update(['otp' => 0]);
 
-        if($user && $user->otp == $request->otp){
-            // Clear OTP after successful verification
-            $user->update(['otp' => null]);
+                $token = $user->createToken('reset_password_token')->plainTextToken;
+
+                return response()->json([
+                    'message' => "OTP verified successfully",
+                    'status' => 200,
+                    'token' => $token
+                ], 200);
+            }
 
             return response()->json([
-                'message' => 'OTP verified successfully',
-                'status' => 200,
-            ], 200);
-        }
+                'success' => "failed",
+                'message' => "Invalid OTP or email.",
+                'status' => 400
+            ], 400);
 
-        return response()->json([
-            'status'  => 'fail',
-            'message' => 'Invalid OTP or email',
-        ], 401);    
+        }catch(Exception $e){
+            return response()->json([
+                'message' =>  $e->getMessage(),
+                'status'  => 500,
+            ], 500);
+        }
     }
 
-    //reset password
- 
+    //User Reset Password Api Sanctum implementation
+    public function forgetPassword(Request $request)
+    {
+        try{
+            //  Validate input
+            $request->validate([
+                'password' => 'required|string|min:6|confirmed',
+            ]);
+
+            // Get authenticated user from Sanctum token
+            $user = $request->user();
+
+            if (!$user) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Unauthorized or invalid token.',
+                ], 401);
+            }
+
+            // Update password securely
+            $user->update([
+                'password' => bcrypt($request->password),
+            ]);
+
+            // Delete token after successful reset (for security)
+            $request->user()->currentAccessToken()->delete();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Password reset successfully.',
+            ], 200);
+
+        }catch(Exception $e){
+            return response()->json([
+                'message' =>  $e->getMessage(),
+                'status'  => 500,
+            ], 500);
+        }
+    }
+    
 }

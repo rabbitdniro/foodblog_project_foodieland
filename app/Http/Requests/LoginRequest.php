@@ -21,9 +21,25 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
+        // return [
+        //     'email' => 'required|email',
+        //     'password' => 'required|string|min:4|max:16'
+        // ];
+
+        // stronger Login password validation rules
         return [
             'email' => 'required|email',
-            'password' => 'required|string|min:4|max:16'
+            'password' => [
+                'required',
+                'string',
+                'min:8', // minimum 8 characters
+                'max:16', // maximum 16 characters
+                'regex:/[a-z]/',      // at least one lowercase letter
+                'regex:/[A-Z]/',      // at least one uppercase letter
+                'regex:/[0-9]/',      // at least one digit
+                'regex:/[@$!%*?&]/',  // at least one special character
+            ],
         ];
+
     }
 }
