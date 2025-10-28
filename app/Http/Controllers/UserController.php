@@ -108,8 +108,12 @@ class UserController extends Controller
 
     //send otp function
     public function sendOTP(Request $request){
-        try{
-            $email = $request->email;
+        //validate request
+        $email = $request->validate([
+            'email' => 'required|email|exists:users,email'
+        ]);
+
+        try{  
             $otp = rand(10000, 99999);
             $count = User::where('email', $email)->count();
 
@@ -122,7 +126,8 @@ class UserController extends Controller
 
                 return response()->json([
                     'message' => "OTP sent successfully",
-                    'status' => 200
+                    'status' => 200,
+                    'otp' => $otp
                 ], 200);            
             }
 
@@ -141,6 +146,31 @@ class UserController extends Controller
     }
 
     //verify otp
+    public function verifyOTP(Request $request){
+        //validate request
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:5',
+        ]);
+
+        //Find user by email
+        $user = User::where('email', $request->email)->first();
+
+        if($user && $user->otp == $request->otp){
+            // Clear OTP after successful verification
+            $user->update(['otp' => null]);
+
+            return response()->json([
+                'message' => 'OTP verified successfully',
+                'status' => 200,
+            ], 200);
+        }
+
+        return response()->json([
+            'status'  => 'fail',
+            'message' => 'Invalid OTP or email',
+        ], 401);    
+    }
 
     //reset password
  
