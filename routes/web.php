@@ -1,25 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UserController;
 
-Route::get('/', function () {
-    return view('pages.home');
-});
+// Frontend View Routes
+Route::get('/register', [UserController::class, 'registerPage'])->name('register.show');
+Route::get('/login', [UserController::class, 'loginPage'])->name('login.show');
+Route::get('/sand-otp', [UserController::class, 'sandOTPPage'])->name('otp.show');
+Route::get('/password-forgot', [UserController::class, 'resetPasswordPage'])->name('password.forgot.show');
 
-Route::get('/blog', function () {
-    return view('pages.blogs');
-});
+//................................................................................
 
-Route::get('/contact', function () {
-    return view('pages.contact');
-});
+Route::get('/', [HomeController::class, 'homePage'])->name('home.page');
+Route::get('/blog', [HomeController::class, 'blogPage'])->name('blog.page');
+Route::get('/contact', [HomeController::class, 'contactPage'])->name('contact.page');
 
-// Registration
-Route::get('/register', function () {
-    return view('pages.register');
-})->name('register.show');
+//................................................................................
+
+//Backend Controllers Route
+//User API Routes
+Route::post('/login', [UserController::class, 'userLogin'])->name('login');
+Route::post('/register', [UserController::class, 'userRegister'])->name('register');
+
 
 Route::post('/register', function (Request $request) {
     $request->validate([
@@ -33,10 +38,6 @@ Route::post('/register', function (Request $request) {
     return redirect()->route('otp.show');
 })->name('register.submit');
 
-// Login (mobile only)
-Route::get('/login', function () {
-    return view('pages.login');
-})->name('login.show');
 
 Route::post('/login', function (Request $request) {
     $request->validate([
@@ -48,10 +49,6 @@ Route::post('/login', function (Request $request) {
     return redirect()->route('otp.show');
 })->name('login.submit');
 
-// OTP verification (6 digits)
-Route::get('/otp', function () {
-    return view('pages.otp');
-})->name('otp.show');
 
 Route::post('/otp', function (Request $request) {
     $request->validate([
@@ -62,10 +59,6 @@ Route::post('/otp', function (Request $request) {
     return redirect('/');
 })->name('otp.verify');
 
-// Password reset - request form
-Route::get('/password/forgot', function () {
-    return view('pages.password.forgot');
-})->name('password.forgot.show');
 
 Route::post('/password/forgot', function (Request $request) {
     $request->validate([
